@@ -36,4 +36,23 @@ class ProductRepositoryImpl implements ProductRepository {
     await Future.delayed(const Duration(milliseconds: 500));
     _products.removeWhere((product) => product.id == id);
   }
+
+  @override
+  Future<void> adjustStock({required String productId, required int delta}) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    final index = _products.indexWhere((p) => p.id == productId);
+    if (index < 0) {
+      throw Exception('Product not found');
+    }
+    final current = _products[index];
+    final updatedQuantity = (current.stockQuantity + delta);
+    final safeQuantity = updatedQuantity < 0 ? 0 : updatedQuantity;
+    _products[index] = current.copyWith(stockQuantity: safeQuantity);
+  }
+
+  @override
+  Future<List<Product>> getLowStockProducts() async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    return _products.where((p) => p.stockQuantity <= p.minStock).toList();
+  }
 }
