@@ -5,4 +5,6 @@ abstract class ProductRepository {
   Future<Product> getProductById(String id);
   Future<void> saveProduct(Product product);
   Future<void> deleteProduct(String id);
+  Future<void> adjustStock({required String productId, required int delta});
+  Future<List<Product>> getLowStockProducts();
 }
