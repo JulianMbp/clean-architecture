@@ -1,4 +1,4 @@
-import 'package:clean_architecture/data/repositories/product_repository_impl.dart';
+import 'package:clean_architecture/di/injection.dart';
 import 'package:clean_architecture/domain/usecases/delete_product.dart';
 import 'package:clean_architecture/domain/usecases/get_all_products.dart';
 import 'package:clean_architecture/domain/usecases/save_product.dart';
@@ -8,7 +8,9 @@ import 'package:clean_architecture/presentation/pages/product_list_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initInjection();
   runApp(const MyApp());
 }
 
@@ -17,24 +19,24 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Crear instancias de las dependencias
-    final productRepository = ProductRepositoryImpl();
-    final getAllProducts = GetAllProducts(productRepository);
-    final saveProduct = SaveProduct(productRepository);
-    final deleteProduct = DeleteProduct(productRepository);
-
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Clean Architecture',
+      title: 'Inventario PyME',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-        useMaterial3: false,
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF1565C0)),
+        useMaterial3: true,
+        appBarTheme: const AppBarTheme(centerTitle: true),
+        inputDecorationTheme: const InputDecorationTheme(
+          border: OutlineInputBorder(),
+        ),
       ),
       home: BlocProvider(
         create: (context) => ProductBloc(
-          getAllProducts: getAllProducts,
-          saveProduct: saveProduct,
-          deleteProduct: deleteProduct,
+          getAllProducts: sl<GetAllProducts>(),
+          saveProduct: sl<SaveProduct>(),
+          deleteProduct: sl<DeleteProduct>(),
+          adjustStock: sl(),
+          getLowStockProducts: sl(),
         )..add(LoadProducts()),
         child: const ProductListPage(),
       ),
